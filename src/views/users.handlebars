@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <title>Lista de Usuarios</title>
+     <link rel="stylesheet" href="/css/styles.css">
+     <link rel="stylesheet" href="/css/users.css">
+</head>
+<body>
+    <h1>Usuarios registrados</h1>
+    <ul>
+        {{#each users}}
+            <li>{{this.first_name}} - {{this.email}}</li>
+        {{/each}}
+    </ul>
+</body>
+</html>

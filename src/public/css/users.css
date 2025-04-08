@@ -1,0 +1,18 @@
+h1 {
+    color: #6f42c1;
+}
+
+.user-list {
+    list-style: none;
+    padding: 0;
+}
+
+.user-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    background: white;
+}
+
+.user-list li:nth-child(even) {
+    background: #f4f4f4;
+}
