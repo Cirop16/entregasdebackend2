@@ -1,12 +1,28 @@
-<head>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="/css/register.css">
-</head>
+<link rel="stylesheet" href="/css/register.css">
 
-<h1>Registro de usuario</h1>
-<form action="/api/auth/register" method="POST">
+<form id="registerForm">
     <input type="text" name="first_name" placeholder="Nombre" required>
+    <input type="text" name="last_name" placeholder="Apellido" required>
     <input type="email" name="email" placeholder="Correo electrónico" required>
+    <input type="number" name="age" placeholder="Edad" required>
     <input type="password" name="password" placeholder="Contraseña" required>
-    <button type="submit">Registrarse</button>
+    <button type="submit">Registrar</button>
 </form>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+    const userData = Object.fromEntries(formData.entries());
+
+    const response = await fetch('/api/auth/register', {
+             method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+    });
+
+    const result = await response.json();
+    alert(result.message);
+});
+</script>

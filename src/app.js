@@ -8,6 +8,7 @@ import passport from './config/passportConfig.js';
 import authRoutes from './routes/auth.js';
 import sessionsRoutes from './routes/sessions.js';
 import { fileURLToPath } from 'url';
+import profileRoutes from './routes/profile.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,14 +46,24 @@ app.get('/profile', (req, res) => {
     res.render('profile', { title: 'Mi Perfil' });
 });
 
+//retorno de datos,quita si funciona
+app.use('/', profileRoutes);
+
 app.use('/api/auth', authRoutes);
 app.use('/api/sessions', sessionsRoutes);
 
-mongoose.connect(process.env.MONGO_URI)
+//coneccion con atlas
+
+const MONGO_URI = process.env.MONGO_URI;
+
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
     .then(() => console.log('Conectado a MongoDB'))
     .catch(err => console.error('Error de conexión:', err));
 
 
-const PORT = process.env.PORT || 3000; //sacar si funciona
+const PORT = process.env.PORT || 3000;
 
 app.listen(3000, () => console.log('Servidor corriendo en el puerto 3000'));
