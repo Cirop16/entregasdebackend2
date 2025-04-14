@@ -6,3 +6,8 @@
 ✅ Protección de rutas con Passport
 
 > 💡 Este backend puede servir como base para una API de ecommerce, una aplicación web con autenticación o cualquier proyecto que requiera gestión de usuarios segura.
+
+Prueba los endpoints en Postman o localhost:
+🔹 Registrar usuario: POST http://localhost:3000/api/sessions/register
+🔹 Iniciar sesión: POST http://localhost:3000/api/sessions/login
+🔹 Usuario actual: GET http://localhost:3000/api/sessions/current
