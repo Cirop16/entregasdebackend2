@@ -11,9 +11,3 @@ Prueba los endpoints en Postman o localhost:
 🔹 Registrar usuario: POST http://localhost:3000/api/sessions/register
 🔹 Iniciar sesión: POST http://localhost:3000/api/sessions/login
 🔹 Usuario actual: GET http://localhost:3000/api/sessions/current
-
-MONGO_URI=mongodb+srv://codertester:1234567890@clustercod.mq9qg19.mongodb.net/?retryWrites=true&w=majority&appName=ClusterCod
-
-JWT_SECRET=miClaveSuperSecreta
-
-SESSION_SECRET=clave_super_segura
