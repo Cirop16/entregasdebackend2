@@ -1,47 +1,58 @@
 import express from 'express';
-import ProductsManager from '../managers/productsManager.js';
-import { authorizeRole } from '../middlewares/authMiddleware.js';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../controllers/productsController.js';
+import { isAuthenticated, authorizeRole } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
-const productsManager = new ProductsManager();
 
-router.get('/', async (req, res) => {
+router.get('/', async (req, res, next) => {
     try {
-        const products = await productsManager.getAll();
-        res.json(products);
+        await getProducts(req, res);
     } catch (error) {
-        console.error('Error al obtener productos:', error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        next(error);
     }
 });
 
-router.post('/', authorizeRole(['admin']), async (req, res) => {
+router.post('/', isAuthenticated, authorizeRole(['admin']), async (req, res, next) => {
     try {
-        const newProduct = await productsManager.create(req.body);
-        res.json(newProduct);
+        const { name, price, description } = req.body;
+        if (!name || !price) {
+            return res.status(400).json({ message: 'El nombre y precio son obligatorios.' });
+        }
+        await createProduct(req, res);
     } catch (error) {
-        console.error('Error al crear producto:', error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        next(error);
     }
 });
 
-router.put('/:id', authorizeRole(['admin']), async (req, res) => {
+router.put('/:pid', isAuthenticated, authorizeRole(['admin']), async (req, res, next) => {
     try {
-        const updatedProduct = await productsManager.update(req.params.id, req.body);
-        res.json(updatedProduct);
+        const { pid } = req.params;
+        if (!pid.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: 'ID de producto inválido.' });
+        }
+
+        const productExists = await updateProduct(req, res);
+        if (!productExists) {
+            return res.status(404).json({ message: 'Producto no encontrado.' });
+        }
     } catch (error) {
-        console.error('Error al actualizar producto:', error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        next(error);
     }
 });
 
-router.delete('/:id', authorizeRole(['admin']), async (req, res) => {
+router.delete('/:pid', isAuthenticated, authorizeRole(['admin']), async (req, res, next) => {
     try {
-        await productsManager.delete(req.params.id);
-        res.json({ message: 'Producto eliminado exitosamente' });
+        const { pid } = req.params;
+        if (!pid.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: 'ID de producto inválido.' });
+        }
+
+        const productExists = await deleteProduct(req, res);
+        if (!productExists) {
+            return res.status(404).json({ message: 'Producto no encontrado.' });
+        }
     } catch (error) {
-        console.error('Error al eliminar producto:', error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        next(error);
     }
 });
 

@@ -1,17 +1,12 @@
 import User from '../models/User.js';
 
 class UserDAO {
-    async getById(id) {
-        return await User.findById(id);
-    }
-
-    async getByEmail(email) {
+    async getUserByEmail(email) {
         return await User.findOne({ email });
     }
 
-    async create(userData) {
-        const newUser = new User(userData);
-        return await newUser.save();
+    async registerUser(userData) {
+        return await User.create(userData);
     }
 }
 

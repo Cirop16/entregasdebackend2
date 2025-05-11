@@ -1,21 +1,39 @@
 import Cart from '../models/Cart.js';
 
 class CartDAO {
-    async getById(id) {
-        return await Cart.findById(id).populate('products');
+    async createCart(userId) {
+        try {
+            const newCart = await Cart.create({ userId, items: [] });
+            return newCart;
+        } catch (error) {
+            console.error('Error al crear el carrito:', error);
+            throw new Error('No se pudo crear el carrito');
+        }
     }
 
-    async create(cartData) {
-        const newCart = new Cart(cartData);
-        return await newCart.save();
+    async getById(cartId) {
+        try {
+            const cart = await Cart.findById(cartId).populate('items.product');
+            return cart || null;
+        } catch (error) {
+            console.error('Error al obtener el carrito:', error);
+            throw new Error('No se pudo encontrar el carrito');
+        }
     }
 
-    async addProduct(cartId, productId, quantity) {
-        return await Cart.findByIdAndUpdate(cartId, { $push: { products: { product: productId, quantity } } }, { new: true });
-    }
-
-    async deleteProduct(cartId, productId) {
-        return await Cart.findByIdAndUpdate(cartId, { $pull: { products: { product: productId } } }, { new: true });
+    async updateCart(cartId, updatedItems) {
+        try {
+            const cart = await Cart.findById(cartId);
+            if (!cart) {
+                throw new Error('Carrito no encontrado');
+            }
+            cart.items = updatedItems;
+            await cart.save();
+            return cart;
+        } catch (error) {
+            console.error('Error al actualizar el carrito:', error);
+            throw new Error('No se pudo actualizar el carrito');
+        }
     }
 }
 

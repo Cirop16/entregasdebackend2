@@ -1,10 +1,6 @@
 import userDAO from '../dao/userDAO.js';
 
-class UserRepository {
-    async getUserByEmail(email) {
-        return await userDAO.getUserByEmail(email);
-    }
-
+class UserService {
     async getUserById(userId) {
         return await userDAO.getUserById(userId);
     }
@@ -14,4 +10,4 @@ class UserRepository {
     }
 }
 
-export default new UserRepository();
+export default new UserService();

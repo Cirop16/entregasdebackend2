@@ -2,10 +2,10 @@ import passport from 'passport';
 import jwt from 'jsonwebtoken';
 
 export const verifyToken = (req, res, next) => {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
 
     if (!token) {
-        return res.status(401).json({ message: 'Acceso denegado' });
+        return res.status(401).json({ message: 'Acceso denegado. Se requiere autenticación.' });
     }
 
     try {
@@ -13,15 +13,36 @@ export const verifyToken = (req, res, next) => {
         req.user = decoded;
         next();
     } catch (error) {
-        res.status(403).json({ message: 'Token inválido o expirado' });
+        res.status(403).json({ message: 'Token inválido o expirado.' });
     }
 };
 
-export const isAuthenticated = passport.authenticate('jwt', { session: false });
+//export const isAuthenticated = passport.authenticate('jwt', { session: false });
+
+/*export const isAuthenticated = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: 'Usuario no autenticado' });
+    }
+    next();
+};*/
+
+export const isAuthenticated = (req, res, next) => {
+    passport.authenticate('jwt', { session: false }, (err, user) => {
+        if (err || !user) {
+            return res.status(401).json({ message: 'No autorizado. Token inválido o usuario no encontrado.' });
+        }
+
+        req.login(user, { session: false }, (error) => {
+            if (error) return res.status(500).json({ message: 'Error interno en la autenticación.' });
+            req.user = user;
+            next();
+        });
+    })(req, res, next);
+};
 
 export const authorizeRole = (allowedRoles) => {
     return (req, res, next) => {
-        if (!req.user) {
+        if (!req.user || !req.user.role) {
             return res.status(401).json({ message: 'No autorizado. Se requiere autenticación.' });
         }
 
@@ -31,4 +52,19 @@ export const authorizeRole = (allowedRoles) => {
 
         next();
     };
+};
+
+//si genera problemas, elminar
+export const authorizeUser = (req, res, next) => {
+    if (!req.user || req.user.role !== 'user') {
+        return res.status(403).json({ message: 'Solo los usuarios pueden agregar productos a su carrito.' });
+    }
+    next();
+};
+
+export const isAdmin = (req, res, next) => {
+    if (!req.user || !req.user.role || req.user.role !== 'admin') {
+        return res.status(403).json({ message: 'Acceso denegado. Se requiere rol de administrador.' });
+    }
+    next();
 };

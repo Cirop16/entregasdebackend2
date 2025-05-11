@@ -1,12 +1,8 @@
 import productDAO from '../dao/productDAO.js';
 
-class ProductRepository {
+class ProductService {
     async getProducts() {
         return await productDAO.getAll();
-    }
-
-    async getProductById(productId) {
-        return await productDAO.getById(productId);
     }
 
     async createProduct(productData) {
@@ -22,4 +18,4 @@ class ProductRepository {
     }
 }
 
-export default new ProductRepository();
+export default new ProductService();
