@@ -37,7 +37,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
     secret: process.env.SESSION_SECRET || 'tu_secreto_seguro',
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: { secure: false }
 }));
 
@@ -51,6 +51,22 @@ app.use('/api/products', productRoutes);
 app.use('/api/carts', cartRoutes);
 app.use('/', profileRoutes);
 app.use('/', viewRoutes);
+
+app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error al cerrar sesión.' });
+        }
+        res.clearCookie('token');
+        req.session.destroy((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error al eliminar la sesión.' });
+            }
+            res.clearCookie('connect.sid');
+            res.status(200).json({ message: 'Sesión cerrada correctamente.' });
+        });
+    });
+});
 
 app.get('/', (req, res) => {
     res.render('home', { title: 'Bienvenido al Proyecto' });

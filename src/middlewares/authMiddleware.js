@@ -27,16 +27,17 @@ export const verifyToken = (req, res, next) => {
 };*/
 
 export const isAuthenticated = (req, res, next) => {
+    console.log('Verificando autenticación...');
+
     passport.authenticate('jwt', { session: false }, (err, user) => {
         if (err || !user) {
+            console.error('Error de autenticación:', err);
             return res.status(401).json({ message: 'No autorizado. Token inválido o usuario no encontrado.' });
         }
 
-        req.login(user, { session: false }, (error) => {
-            if (error) return res.status(500).json({ message: 'Error interno en la autenticación.' });
-            req.user = user;
-            next();
-        });
+        console.log('Usuario autenticado:', user.email);
+        req.user = user;
+        return next();
     })(req, res, next);
 };
 

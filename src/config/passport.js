@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 
 const generateToken = (user) => {
     return jwt.sign(
-        { id: user._id, email: user.email, role: user.role },
+        { id: user._id.toString(), email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
     );
@@ -57,7 +57,16 @@ passport.use('login', new LocalStrategy({
     }
 }));
 
-const cookieExtractor = req => req.cookies?.token || req.headers.authorization?.split(' ')[1];
+const cookieExtractor = (req) => {
+    if (req && req.cookies) {
+        return req.cookies.token || null;
+    }
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+        return req.headers.authorization.split(' ')[1];
+    }
+    return null;
+};
+
 const jwtOpts = {
     jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
     secretOrKey: process.env.JWT_SECRET
@@ -65,6 +74,10 @@ const jwtOpts = {
 
 passport.use(new JwtStrategy(jwtOpts, async (jwt_payload, done) => {
     try {
+        if (!jwt_payload.id) {
+            return done(null, false, { message: 'Token inválido o sin ID.' });
+        }
+
         const user = await userDAO.getUserById(jwt_payload.id);
         if (!user) {
             return done(null, false, { message: 'Token inválido o usuario no encontrado' });
@@ -77,7 +90,7 @@ passport.use(new JwtStrategy(jwtOpts, async (jwt_payload, done) => {
 }));
 
 passport.serializeUser((user, done) => {
-    done(null, user._id);
+    done(null, user._id.toString());
 });
 
 passport.deserializeUser(async (id, done) => {

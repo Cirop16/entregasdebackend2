@@ -14,20 +14,26 @@ export const getProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try {
-        if (!req.user || req.user.role !== 'admin') {
-            return res.status(403).json({ message: 'Acceso denegado. Solo los administradores pueden crear productos.' });
+        console.log('Datos recibidos:', req.body);
+
+        const { title, description, price, category, stock, code, thumbnail, status } = req.body;
+
+        if (!title || !description || !price || !category || !stock || !code) {
+            return res.status(400).json({ message: 'El título, descripción, precio, categoría, stock y código son obligatorios.' });
         }
 
-        const { name, price, description } = req.body;
-        if (!name || !price) {
-            return res.status(400).json({ message: 'El nombre y el precio son obligatorios.' });
+        const existingProduct = await Product.findOne({ code });
+        if (existingProduct) {
+            return res.status(400).json({ message: 'El código de producto ya está en uso.' });
         }
 
-        const newProduct = await productDAO.create({ name, price, description });
-        res.status(201).json({ message: 'Producto creado exitosamente', product: newProduct });
+        const newProduct = new Product({ title, description, price, category, stock, code, thumbnail, status });
+        await newProduct.save();
+
+        res.status(201).json({ message: 'Producto creado correctamente.', product: newProduct });
     } catch (error) {
         console.error('Error al crear producto:', error);
-        res.status(500).json({ message: 'Error interno del servidor' });
+        res.status(500).json({ message: 'Error interno del servidor.' });
     }
 };
 

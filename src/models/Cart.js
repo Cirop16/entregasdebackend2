@@ -10,12 +10,18 @@ const cartSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 cartSchema.methods.calculateTotal = async function () {
-    let total = 0;
-    for (const item of this.items) {
-        const product = await mongoose.model('Product').findById(item.product);
-        if (product) total += product.price * item.quantity;
-    }
-    this.totalPrice = total;
+    const productIds = this.items.map(item => item.product);
+    const products = await mongoose.model('Product').find({ _id: { $in: productIds } });
+
+    const productMap = products.reduce((acc, product) => {
+        acc[product._id] = product.price;
+        return acc;
+    }, {});
+
+    this.totalPrice = this.items.reduce((total, item) => {
+        return total + (productMap[item.product] * item.quantity || 0);
+    }, 0);
+
     await this.save();
 };
 

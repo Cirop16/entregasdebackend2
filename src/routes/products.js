@@ -4,55 +4,59 @@ import { isAuthenticated, authorizeRole } from '../middlewares/authMiddleware.js
 
 const router = express.Router();
 
-router.get('/', async (req, res, next) => {
+const isValidMongoId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
+
+router.get('/', async (req, res) => {
     try {
         await getProducts(req, res);
     } catch (error) {
-        next(error);
+        console.error('Error al obtener productos:', error);
+        res.status(500).json({ message: 'Error interno al obtener productos.' });
     }
 });
 
-router.post('/', isAuthenticated, authorizeRole(['admin']), async (req, res, next) => {
+router.post('/', isAuthenticated, authorizeRole(['admin']), async (req, res) => {
     try {
-        const { name, price, description } = req.body;
-        if (!name || !price) {
-            return res.status(400).json({ message: 'El nombre y precio son obligatorios.' });
-        }
         await createProduct(req, res);
     } catch (error) {
-        next(error);
+        console.error('Error en la creación de productos:', error);
+        res.status(500).json({ message: 'Error interno al crear producto.' });
     }
 });
 
-router.put('/:pid', isAuthenticated, authorizeRole(['admin']), async (req, res, next) => {
+router.put('/:pid', isAuthenticated, authorizeRole(['admin']), async (req, res) => {
     try {
         const { pid } = req.params;
-        if (!pid.match(/^[0-9a-fA-F]{24}$/)) {
+        if (!isValidMongoId(pid)) {
             return res.status(400).json({ message: 'ID de producto inválido.' });
         }
 
-        const productExists = await updateProduct(req, res);
-        if (!productExists) {
+        const updatedProduct = await updateProduct(req, res);
+        if (!updatedProduct) {
             return res.status(404).json({ message: 'Producto no encontrado.' });
         }
+        res.status(200).json({ message: 'Producto actualizado correctamente.', product: updatedProduct });
     } catch (error) {
-        next(error);
+        console.error('Error al actualizar producto:', error);
+        res.status(500).json({ message: 'Error interno al actualizar producto.' });
     }
 });
 
-router.delete('/:pid', isAuthenticated, authorizeRole(['admin']), async (req, res, next) => {
+router.delete('/:pid', isAuthenticated, authorizeRole(['admin']), async (req, res) => {
     try {
         const { pid } = req.params;
-        if (!pid.match(/^[0-9a-fA-F]{24}$/)) {
+        if (!isValidMongoId(pid)) {
             return res.status(400).json({ message: 'ID de producto inválido.' });
         }
 
-        const productExists = await deleteProduct(req, res);
-        if (!productExists) {
+        const deletedProduct = await deleteProduct(req, res);
+        if (!deletedProduct) {
             return res.status(404).json({ message: 'Producto no encontrado.' });
         }
+        res.status(200).json({ message: 'Producto eliminado correctamente.', product: deletedProduct });
     } catch (error) {
-        next(error);
+        console.error('Error al eliminar producto:', error);
+        res.status(500).json({ message: 'Error interno al eliminar producto.' });
     }
 });
 

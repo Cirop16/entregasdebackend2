@@ -1,5 +1,5 @@
 import ticketDAO from '../dao/ticketDAO.js';
-import { TicketDTO } from '../dtos/TicketDTO.js';
+import { TicketDTO } from '../dto/TicketDTO.js';
 
 class TicketService {
     async createTicket(ticketData) {

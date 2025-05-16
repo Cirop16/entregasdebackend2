@@ -35,10 +35,19 @@ router.get('/current', isAuthenticated, async (req, res) => {
 });
 
 router.get('/logout', (req, res) => {
-    res.clearCookie('token');
-    req.logout((err) => { 
-        if (err) { return next(err); }
-        res.redirect('/login');
+    req.logout((err) => {
+        if (err) {
+            console.error('Error en logout:', err);
+            return res.status(500).json({ message: 'Error al cerrar sesión.' });
+        }
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error al eliminar la sesión:', err);
+                return res.status(500).json({ message: 'Error al eliminar la sesión.' });
+            }
+            res.clearCookie('connect.sid');
+            res.status(200).json({ message: 'Sesión cerrada correctamente.' });
+        });
     });
 });
 

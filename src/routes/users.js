@@ -1,7 +1,7 @@
 import express from 'express';
 import { getUserById, registerUser, getCurrentUser } from '../controllers/usuariosController.js';
 import { authorizeRole, isAuthenticated } from '../middlewares/authMiddleware.js';
-import { UserDTO } from '../dtos/UserDTO.js';
+import { UserDTO } from '../dto/userDTO.js';
 
 const router = express.Router();
 

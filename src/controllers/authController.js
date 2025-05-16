@@ -1,15 +1,19 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-export const logout = (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Error al cerrar sesión:', err);
-            return res.status(500).json({ message: 'Error interno al cerrar sesión' });
-        }
-        res.clearCookie('token');
-        res.status(200).json({ message: 'Sesión cerrada correctamente' });
-    });
+export const logout = async (req, res) => {
+    try {
+        req.logout((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Error al cerrar sesión.' });
+            }
+            res.clearCookie('token');
+            res.status(200).json({ message: 'Sesión cerrada correctamente.' });
+        });
+    } catch (error) {
+        console.error('Error en logout:', error);
+        res.status(500).json({ message: 'Error interno del servidor.' });
+    }
 };
 
 export const generateToken = (user) => {
