@@ -1,19 +1,7 @@
-✅ Manejo de usuarios con MongoDB
-✅ Encriptación de contraseñas con bcrypt
-✅ Autenticación con passport-jwt
-✅ Login con JWT y almacenamiento seguro en cookies
-✅ Validación de usuario con estrategia current
-✅ Protección de rutas con Passport
+🔹 Visión General
 
-> 💡 Este backend puede servir como base para una API de ecommerce, una aplicación web con autenticación o cualquier proyecto que requiera gestión de usuarios segura.
+Este proyecto es una API para administrar carritos de compras,
+permitiendo a los usuarios autenticados agregar productos, realizar compras y generar tickets.
+Está construido con Node.js, Express.js, MongoDB y Mongoose,
+utilizando una arquitectura basada en DAO (Data Access Object) para gestionar los datos.
 
-Prueba los endpoints en Postman o localhost:
-🔹 Registrar usuario: POST http://localhost:3000/api/sessions/register
-🔹 Iniciar sesión: POST http://localhost:3000/api/sessions/login
-🔹 Usuario actual: GET http://localhost:3000/api/sessions/current
-
-MONGO_URI=mongodb+srv://codertester:1234567890@clustercod.mq9qg19.mongodb.net/?retryWrites=true&w=majority&appName=ClusterCod
-
-JWT_SECRET=miClaveSuperSecreta
-
-SESSION_SECRET=clave_super_segura
